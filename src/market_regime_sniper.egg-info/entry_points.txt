@@ -1,0 +1,2 @@
+[console_scripts]
+cosine-norm = market_regime_sniper.pipeline:run_full_pipeline

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "market-regime-sniper"
+version = "0.1.0"
+description = "Market regime detection with SSA + UMAP + HDBSCAN and a Hybrid Sniper DCA backtest."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Stavros Topalidis" }]
+keywords = ["finance", "market-regimes", "ssa", "umap", "hdbscan", "backtesting"]
+dependencies = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "umap-learn",
+  "hdbscan",
+  "scikit-learn",
+  "scipy",
+]
+
+[project.scripts]
+cosine-norm = "market_regime_sniper.pipeline:run_full_pipeline"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+market_regime_sniper = ["spx.csv"]

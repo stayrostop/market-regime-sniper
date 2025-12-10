@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/market_regime_sniper/__init__.py
+src/market_regime_sniper/data.py
+src/market_regime_sniper/my_stats.py
+src/market_regime_sniper/pipeline.py
+src/market_regime_sniper/plot.py
+src/market_regime_sniper/sniper_strategy.py
+src/market_regime_sniper/spx.csv
+src/market_regime_sniper/ssa_utils.py
+src/market_regime_sniper.egg-info/PKG-INFO
+src/market_regime_sniper.egg-info/SOURCES.txt
+src/market_regime_sniper.egg-info/dependency_links.txt
+src/market_regime_sniper.egg-info/entry_points.txt
+src/market_regime_sniper.egg-info/requires.txt
+src/market_regime_sniper.egg-info/top_level.txt

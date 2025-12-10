@@ -1,0 +1,155 @@
+Metadata-Version: 2.4
+Name: market-regime-sniper
+Version: 0.1.0
+Summary: Market regime detection with SSA + UMAP + HDBSCAN and a Hybrid Sniper DCA backtest.
+Author: Stavros Topalidis
+Keywords: finance,market-regimes,ssa,umap,hdbscan,backtesting
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: matplotlib
+Requires-Dist: umap-learn
+Requires-Dist: hdbscan
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+
+Market Regime Sniper (SSA + UMAP + HDBSCAN)
+===========================================
+
+![Regime magnitude overlay](image-1.png)
+
+`cosine_norm.ipynb` is now a reproducible, GitHub-ready project that discovers long-term S&P 500 regimes from yearly shape features and backtests a regime-aware DCA (“Hybrid Sniper”). Everything is leakage-free: models are fit on 1950–2000, regimes are lagged by one year for the strategy, and later years are visualization/validation only.
+
+Why this belongs in a portfolio
+- Full pipeline in code and notebook: feature construction → SSA smoothing → UMAP → HDBSCAN → statistical validation → Hybrid Sniper backtest.
+- Leakage-free design with fixed training window and lagged labels.
+- Rich validation: 8 statistical tests plus silhouette scores.
+- Visual storytelling: regime magnitude plotted on log(SPX).
+- Ready-to-run CLI (`cosine-norm`) plus the original notebook for exploration.
+
+Quickstart
+1) Python 3.10+ recommended. Create and activate a virtual env.
+2) `pip install -e .` (or `pip install -r requirements.txt` if you prefer plain deps).
+3) Run the full demo: `cosine-norm` (or `python -m market_regime_sniper.pipeline`).
+4) Optional: open `notebooks/01_experiments.ipynb` in Jupyter to step through the experiment.
+
+What you get when running the CLI
+- Loads `spx.csv` (Stooq SPX daily, 1950–2025), builds cosine + norm yearly features.
+- Runs SSA (L_cos=55, L_norm=63), UMAP (n_neighbors=6, min_dist=0), HDBSCAN (min_cluster_size=6).
+- Prints cluster stats and test results, opens the regime magnitude plot, and reports Hybrid Sniper vs baseline DCA metrics.
+
+Project layout
+- `src/market_regime_sniper/pipeline.py` — one-shot runner: builds features, clusters, plots, and backtests.
+- `src/market_regime_sniper/data.py` — data loader and cosine/norm feature builder.
+- `src/market_regime_sniper/ssa_utils.py` — SSA + UMAP + HDBSCAN pipeline and SSA helper.
+- `src/market_regime_sniper/sniper_strategy.py` — Hybrid Sniper backtest and metrics.
+- `src/market_regime_sniper/my_stats.py` — 8 statistical tests via `ClusterRegimeTester`.
+- `src/market_regime_sniper/plot.py` — leakage-aware regime magnitude visualization on log(SPX).
+- `notebooks/01_experiments.ipynb` — the original research notebook (formerly `cosine_norm.ipynb`).
+- `requirements.txt` — minimal dependencies; `pyproject.toml` adds an installable CLI.
+- `image.png`, `image-1.png` — example outputs for the README.
+
+Method (condensed)
+1) Per-year normalization of SPX close; build `[x_i, x_{i+1}]` vectors → cosine + norm curves.
+2) SSA smoothing with L_cos=55 (direction) and L_norm=63 (amplitude).
+3) UMAP 2D embedding (metric=euclidean), HDBSCAN clustering (min_cluster_size=6, min_samples=6).
+4) Regime IDs from annual returns (bear, aggressive bull, Sharpe-optimal bull) with stats table.
+5) Validation: Welch t-test, Mann–Whitney, Levene, KS, Anderson–Darling, Cohen’s d, Memmel, GRS.
+6) Hybrid Sniper backtest: lagged regimes, MA200 trend filter, volatility-scaling, cash yield and borrow cost.
+
+Results snapshot
+- Train 1950–2005: Hybrid Sniper lifts CAGR from ~5.5% (naive DCA) to ~8.4% with similar max drawdown; higher Calmar.
+- Extend labels to 2006–2025 via SVM on the UMAP latent space (bull/bear definitions frozen): ~9.5% CAGR with lower max drawdown than naive DCA.
+- Silhouette > 0.90 on yearly embeddings; p < 0.001 across separation tests.
+
+Reproduce / modify
+- Run `cosine-norm` to get the baseline chart and metrics.
+- Edit `src/market_regime_sniper/pipeline.py` for different SSA/UMAP/HDBSCAN knobs or budget/exposure settings.
+- Use `ssa_utils.py` directly if you want to plug your own features or run cross-market experiments (DJI, NASDAQ tested with the same hyperparameters).
+
+Notebook
+- `notebooks/01_experiments.ipynb` mirrors the code path above, with narrative commentary and cells for each step. Install `notebook` or `jupyterlab` if you want to execute it interactively.
+
+Notes
+- All clustering and regime definitions are trained on 1950–2000; the strategy uses the previous year’s label only.
+- The project is self-contained and runs offline with the provided CSV. Replace `spx.csv` if you want fresher data.
+
+
+⸻
+
+✅ 1. Identical Regime Structure Across All Indices
+
+Across SPX, DJI, and NASDAQ, the algorithm consistently discovered four stable market regimes:
+
+Cluster ID	Interpretation	Cross-Market Characteristics
+0	Steady / Smart Bull	High mean return, high Sharpe, persistent sequences
+1	Moderate Bull	Mildly positive, transitional state
+2	Neutral / Low Growth	Flat-to-low returns, often mid-cycle
+3	Bear / Crash Regime	Deep negative returns, high volatility
+
+Despite large differences in composition, sector weights, and historical profiles,
+all three indices converged to the same four-phase macro-cycle.
+
+This is a strong indication that the method is extracting universal market geometry, not index-specific noise.
+
+⸻
+
+✅ 2. Statistical Separability Is Stable Across Markets
+
+Across all indices:
+	•	Welch tests: p < 0.001 for bull vs rest
+	•	Mann–Whitney: p < 0.001
+	•	KS & AD tests: strong distributional divergence
+	•	Cohen’s d for Bull vs Bear: 2.4–4.0 (extremely large effect size)
+	•	GRS test: significant at p < 0.001
+
+This demonstrates non-random, statistically separable clusters across datasets with different volatility regimes.
+
+⸻
+
+✅ 3. High-Quality Embeddings (UMAP) in All Markets
+
+UMAP consistently produced well-separated 2D manifolds for SPX, DJI, NASDAQ:
+	•	SPX silhouette: 0.88
+	•	DJI silhouette: 0.88
+	•	NASDAQ silhouette: 0.88
+
+This symmetry implies:
+	•	The SSA-denoised representations encode similar latent structure
+	•	Market cycles share a common nonlinear manifold
+	•	Volatility and price-shape dynamics are inherently geometric across indices
+
+⸻
+
+✅ 4. Universal Pattern Persistence (Prefix-Projected Pattern Growth)
+
+Frequent-pattern mining on the regime sequences revealed the same dominant patterns across every index:
+
+Top recurring patterns (all indices):
+	•	[SMART_BULL]
+	•	[SMART_BULL → SMART_BULL]
+	•	[BEAR]
+	•	[CL-1] (moderate bull)
+	•	[BEAR → SMART_BULL] (recovery pattern)
+	•	[SMART_BULL → CL-1]
+	•	[SMART_BULL → BEAR]
+
+These patterns appear 50–66 times per century, indicating that:
+
+Equity markets exhibit universal regime cycles regardless of index composition.
+
+⸻
+
+✅ 5. Markov Chain Stability Across Indices
+
+Transition matrices and entropy rates remained nearly identical:
+	•	Entropy rate: 1.75–1.80 bits
+	•	Stationary distribution:
+	•	Bull ~0.46
+	•	Neutral ~0.16
+	•	Bear ~0.18–0.20
+
+This suggests a quasi-stationary macro cycle with remarkably consistent transition probabilities.
+
+⸻
