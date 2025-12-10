@@ -4,7 +4,7 @@
 Market Regime Sniper
 
 Unsupervised + Supervised Market Regime Detection & Dynamic Portfolio Allocation
-
+![alt text](image-1.png)
 ⸻
 
 Overview
@@ -19,7 +19,7 @@ Market Regime Sniper is an end-to-end research pipeline that identifies, validat
 	•	Regime-aware portfolio strategy with volatility control
 
 The goal is to uncover structural dynamics in long-horizon equity markets and use them to build systematic allocation logic that adapts to different phases of the market cycle.
-
+![alt text](image.png)
 ⸻
 
 🔧 Project Architecture
@@ -126,7 +126,7 @@ python3 -m market_regime_sniper.pipeline
 Explore notebooks
 
 notebooks/
-├── 01_experiments_clean.ipynb
+├── 01_experiments.ipynb
 └── 02_supervised_regimes.ipynb
 
 
