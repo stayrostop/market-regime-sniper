@@ -1,6 +1,3 @@
-
-⸻
-
 Market Regime Sniper
 
 Unsupervised + Supervised Market Regime Detection & Dynamic Portfolio Allocation
@@ -22,20 +19,23 @@ The goal is to uncover structural dynamics in long-horizon equity markets and us
 ![alt text](image.png)
 ⸻
 
-🔧 Project Architecture
+## 🧱 Project Architecture
 
+```text
 sp_mapping/
-│
-├── src/market_regime_sniper/
-│   ├── pipeline.py               → Full unsupervised pipeline
-│   ├── sniper_strategy.py        → Regime-based portfolio engine
-│   ├── my_stats.py               → Statistical validation suite
-│   ├── plot.py                   → UMAP + regime magnitude visualizations
-│
 ├── notebooks/
-│   ├── 01_experiments_clean.ipynb       → Unsupervised regime discovery
-│   ├── 02_supervised_regimes.ipynb      → SVM prediction + entropy
-│
+│   ├── 01_experiments_clean.ipynb   # Unsupervised regime discovery
+│   └── 02_supervised_regimes.ipynb  # SVM regime prediction + entropy
+├── src/
+│   └── market_regime_sniper/
+│       ├── __init__.py
+│       ├── data.py
+│       ├── pipeline.py          # Unsupervised pipeline runner
+│       ├── sniper_strategy.py   # Regime-aware DCA / Hybrid Sniper
+│       ├── my_stats.py          # Statistical validation helpers
+│       ├── plot.py              # UMAP & regime magnitude plots
+│       └── ssa_utils.py         # SSA helpers
+├── src/market_regime_sniper/spx.csv  # Sample SPX dataset
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
