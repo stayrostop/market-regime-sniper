@@ -1,4 +1,4 @@
-Market Regime Sniper
+Market Regime Detector
 
 Unsupervised + Supervised Market Regime Detection & Dynamic Portfolio Allocation
 ![alt text](image-1.png)
